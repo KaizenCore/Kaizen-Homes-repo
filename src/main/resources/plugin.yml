@@ -1,0 +1,118 @@
+name: KaizenHomes
+version: '1.0'
+main: kaizen.core.kaizenHomes.KaizenHomes
+api-version: '1.21'
+prefix: Khomes
+load: STARTUP
+authors: [ Timiliris_420 ]
+description: Add modern homes mechanics to minecraft
+
+commands:
+  home:
+    description: Teleport to your home or manage homes
+    usage: |
+      /home - Teleport to default home
+      /home <name> - Teleport to specific home
+      /home set <name> - Set a home
+      /home delete <name> - Delete a home
+      /home rename <old> <new> - Rename a home
+      /home list - List all your homes
+      /home info <name> - Show home information
+      /home setdefault <name> - Set default home
+      /home share <home> <player> - Share home with player
+      /home unshare <home> <player> - Remove player access
+      /home public <name> - Make home public
+      /home private <name> - Make home private
+    aliases: [h]
+
+  homes:
+    description: Open homes GUI menu
+    usage: /homes
+
+  publichomes:
+    description: Browse public homes from all players
+    usage: /publichomes
+    aliases: [phomes]
+
+  gradienttest:
+    description: Show gradient text examples
+    usage: /gradienttest
+    aliases: [gtest, gradients]
+
+  khomes:
+    description: KaizenHomes admin commands
+    usage: |
+      /khomes admin - Open the admin panel GUI
+
+permissions:
+  kaizenhomes.*:
+    description: Gives access to all KaizenHomes features
+    default: op
+    children:
+      kaizenhomes.set: true
+      kaizenhomes.delete: true
+      kaizenhomes.teleport: true
+      kaizenhomes.list: true
+      kaizenhomes.share: true
+      kaizenhomes.public: true
+      kaizenhomes.admin: true
+
+  kaizenhomes.set:
+    description: Allows setting homes
+    default: true
+
+  kaizenhomes.delete:
+    description: Allows deleting homes
+    default: true
+
+  kaizenhomes.teleport:
+    description: Allows teleporting to homes
+    default: true
+
+  kaizenhomes.list:
+    description: Allows listing homes
+    default: true
+
+  kaizenhomes.share:
+    description: Allows sharing homes with other players
+    default: true
+
+  kaizenhomes.public:
+    description: Allows making homes public and viewing public homes
+    default: true
+
+  kaizenhomes.admin:
+    description: Full admin access to all homes features
+    default: op
+
+  kaizenhomes.bypass.cooldown:
+    description: Bypass teleport cooldowns
+    default: op
+
+  kaizenhomes.bypass.warmup:
+    description: Bypass teleport warmup timers
+    default: op
+
+  kaizenhomes.bypass.limit:
+    description: Bypass home limits (infinite homes)
+    default: op
+
+  kaizenhomes.limit.1:
+    description: Allows 1 home
+    default: false
+
+  kaizenhomes.limit.3:
+    description: Allows 3 homes
+    default: true
+
+  kaizenhomes.limit.5:
+    description: Allows 5 homes
+    default: false
+
+  kaizenhomes.limit.10:
+    description: Allows 10 homes
+    default: false
+
+  kaizenhomes.limit.20:
+    description: Allows 20 homes
+    default: false

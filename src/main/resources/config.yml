@@ -1,0 +1,102 @@
+# KaizenHomes Configuration
+# Modern home management plugin for Minecraft
+
+# General Settings
+settings:
+  # Default number of homes a player can have
+  default-home-limit: 3
+
+  # Death home feature - automatically saves death location
+  death-home:
+    enabled: true
+    # Whether to overwrite existing death home
+    overwrite-existing: true
+
+  # Bed sync feature - sync home with bed location
+  bed-sync:
+    enabled: false
+    # Name of the home that will be synced with bed
+    home-name: "bed"
+
+# Teleportation Settings
+teleport:
+  # Safety checks before teleporting
+  safety-check:
+    enabled: true
+    # Automatically find a safe location nearby if the home is unsafe
+    auto-find-safe-location: true
+
+  # Warmup time in seconds before teleporting (0 to disable)
+  warmup-seconds: 3
+
+  # Cooldown time in seconds between teleports (0 to disable)
+  cooldown-seconds: 5
+
+  # Cancel teleport if player moves during warmup
+  cancel-on-move: true
+
+# Economy Settings (requires Vault)
+economy:
+  enabled: false
+  cost:
+    # Cost to set a home
+    set-home: 0.0
+    # Cost per teleport
+    teleport: 0.0
+  refund:
+    # Refund when deleting a home
+    delete-home: 0.0
+
+# Visual and Audio Effects
+effects:
+  particles:
+    enabled: true
+    # Particle type: PORTAL, VILLAGER_HAPPY, ENCHANTMENT_TABLE, etc.
+    type: "PORTAL"
+    amount: 50
+
+  sounds:
+    enabled: true
+    # Sound when teleporting: ENTITY_ENDERMAN_TELEPORT, ENTITY_PLAYER_LEVELUP, etc.
+    teleport: "ENTITY_ENDERMAN_TELEPORT"
+
+  titles:
+    enabled: true
+    teleport:
+      title: "Welcome Home"
+      subtitle: "{home}"
+
+# GUI Settings
+gui:
+  title: "Your Homes"
+  # Size must be a multiple of 9 (9, 18, 27, 36, 45, 54)
+  size: 54
+  # Fill empty slots with a filler item
+  fill-empty-slots: true
+  # Material for filler: GRAY_STAINED_GLASS_PANE, BLACK_STAINED_GLASS_PANE, etc.
+  fill-material: "GRAY_STAINED_GLASS_PANE"
+
+# Sharing Settings
+sharing:
+  enabled: true
+  # Maximum number of players a home can be shared with
+  max-shared-players: 10
+
+  public-homes:
+    enabled: true
+    # Maximum number of public homes per player
+    max-per-player: 5
+
+# Categories Feature
+categories:
+  enabled: true
+  default: "Home"
+
+# Per-World Settings
+per-world:
+  enabled: false
+  limits:
+    # Example: Set different limits for specific worlds
+    # world: 5
+    # world_nether: 2
+    # world_the_end: 1

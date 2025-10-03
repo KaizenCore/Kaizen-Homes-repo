@@ -1,0 +1,93 @@
+# Claude AI files
+CLAUDE.md
+.claude/
+.claude*
+
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+gradle-app.setting
+.gradletasknamecache
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+.metadata
+.recommenders
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# Minecraft/Paper server files (test server)
+run/
+server/
+test-server/
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+
+# Plugin data (development)
+plugins/
+logs/
+cache/
+world/
+world_nether/
+world_the_end/
+crash-reports/
+server.properties
+banned-ips.json
+banned-players.json
+ops.json
+whitelist.json
+usercache.json
+eula.txt
+
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# Package files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Keep the built plugin jar for easy access (optional - uncomment if you want to track it)
+# !build/libs/KaizenHomes-*.jar
