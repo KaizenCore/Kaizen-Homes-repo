@@ -120,6 +120,15 @@ public class YamlStorage implements StorageAdapter {
     }
 
     @Override
+    public List<Home> getHomesCached(UUID owner) {
+        Map<String, Home> playerHomes = homeCache.get(owner);
+        if (playerHomes != null) {
+            return new ArrayList<>(playerHomes.values());
+        }
+        return new ArrayList<>();
+    }
+
+    @Override
     public CompletableFuture<List<Home>> getPublicHomes() {
         return CompletableFuture.supplyAsync(() -> {
             List<Home> publicHomes = new ArrayList<>();

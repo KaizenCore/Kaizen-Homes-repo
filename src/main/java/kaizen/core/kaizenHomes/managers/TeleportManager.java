@@ -15,6 +15,7 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -216,7 +217,8 @@ public class TeleportManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                for (UUID playerId : pendingTeleports.keySet()) {
+                // Create a copy of keys to avoid ConcurrentModificationException
+                for (UUID playerId : new ArrayList<>(pendingTeleports.keySet())) {
                     Player player = Bukkit.getPlayer(playerId);
                     if (player == null || !player.isOnline()) {
                         pendingTeleports.remove(playerId);
@@ -240,11 +242,12 @@ public class TeleportManager {
                     if (request.isExpired()) {
                         pendingTeleports.remove(playerId);
 
-                        // Get the home and execute teleport
-                        Home home = homeManager.getHome(playerId, request.getHomeName()).join();
-                        if (home != null) {
-                            executeTeleport(player, request.getToLocation(), home);
-                        }
+                        // Get the home and execute teleport (non-blocking)
+                        homeManager.getHome(playerId, request.getHomeName()).thenAccept(home -> {
+                            if (home != null && player.isOnline()) {
+                                executeTeleport(player, request.getToLocation(), home);
+                            }
+                        });
                         continue;
                     }
 

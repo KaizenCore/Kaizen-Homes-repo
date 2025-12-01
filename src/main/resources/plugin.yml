@@ -1,5 +1,5 @@
 name: KaizenHomes
-version: '1.0'
+version: '${version}'
 main: kaizen.core.kaizenHomes.KaizenHomes
 api-version: '1.21'
 prefix: Khomes

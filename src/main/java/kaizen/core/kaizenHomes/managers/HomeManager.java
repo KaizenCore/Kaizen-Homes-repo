@@ -96,6 +96,14 @@ public class HomeManager {
     }
 
     /**
+     * Get all homes for a player synchronously from cache (for tab completion)
+     * This method does NOT block and returns immediately from in-memory cache
+     */
+    public List<Home> getHomesCached(UUID playerId) {
+        return storage.getHomesCached(playerId);
+    }
+
+    /**
      * Get the default home for a player
      */
     public CompletableFuture<Home> getDefaultHome(UUID playerId) {

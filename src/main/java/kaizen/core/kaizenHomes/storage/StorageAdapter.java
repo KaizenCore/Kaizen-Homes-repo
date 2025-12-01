@@ -34,6 +34,12 @@ public interface StorageAdapter {
     CompletableFuture<List<Home>> getHomes(UUID owner);
 
     /**
+     * Get all homes for a player synchronously from cache (for tab completion)
+     * This method should NOT block and should return immediately from in-memory cache
+     */
+    List<Home> getHomesCached(UUID owner);
+
+    /**
      * Get all public homes
      */
     CompletableFuture<List<Home>> getPublicHomes();

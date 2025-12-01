@@ -22,6 +22,10 @@ import java.util.stream.Collectors;
 
 public class HomeCommand implements CommandExecutor, TabCompleter {
 
+    private static final int HOME_NAME_MIN_LENGTH = 1;
+    private static final int HOME_NAME_MAX_LENGTH = 32;
+    private static final String HOME_NAME_PATTERN = "^[a-zA-Z0-9_-]+$";
+
     private final KaizenHomes plugin;
     private final HomeManager homeManager;
     private final TeleportManager teleportManager;
@@ -30,6 +34,23 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
         this.plugin = plugin;
         this.homeManager = homeManager;
         this.teleportManager = teleportManager;
+    }
+
+    /**
+     * Validate a home name for security and consistency
+     * @return error message if invalid, null if valid
+     */
+    private String validateHomeName(String name) {
+        if (name == null || name.length() < HOME_NAME_MIN_LENGTH) {
+            return "Home name must be at least " + HOME_NAME_MIN_LENGTH + " character(s)!";
+        }
+        if (name.length() > HOME_NAME_MAX_LENGTH) {
+            return "Home name must be at most " + HOME_NAME_MAX_LENGTH + " characters!";
+        }
+        if (!name.matches(HOME_NAME_PATTERN)) {
+            return "Home name can only contain letters, numbers, dashes, and underscores!";
+        }
+        return null;
     }
 
     @Override
@@ -107,6 +128,10 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
                 return;
             }
             teleportManager.teleportToHome(player, home);
+        }).exceptionally(ex -> {
+            plugin.getLogger().warning("Error getting default home for " + player.getName() + ": " + ex.getMessage());
+            MessageUtil.sendError(player, "An error occurred while teleporting!");
+            return null;
         });
     }
 
@@ -117,6 +142,10 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
                 return;
             }
             teleportManager.teleportToHome(player, home);
+        }).exceptionally(ex -> {
+            plugin.getLogger().warning("Error getting home '" + homeName + "' for " + player.getName() + ": " + ex.getMessage());
+            MessageUtil.sendError(player, "An error occurred while teleporting!");
+            return null;
         });
     }
 
@@ -133,6 +162,13 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
 
         String homeName = args[1].toLowerCase();
 
+        // Validate home name
+        String validationError = validateHomeName(homeName);
+        if (validationError != null) {
+            MessageUtil.sendError(player, validationError);
+            return;
+        }
+
         homeManager.createHome(player, homeName, player.getLocation()).thenAccept(success -> {
             if (success) {
                 MessageUtil.sendHomeSet(player, homeName);
@@ -146,6 +182,10 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
                     }
                 });
             }
+        }).exceptionally(ex -> {
+            plugin.getLogger().warning("Error creating home '" + homeName + "' for " + player.getName() + ": " + ex.getMessage());
+            MessageUtil.sendError(player, "An error occurred while creating your home!");
+            return null;
         });
     }
 
@@ -168,6 +208,10 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
             } else {
                 MessageUtil.sendHomeNotFound(player, homeName);
             }
+        }).exceptionally(ex -> {
+            plugin.getLogger().warning("Error deleting home '" + homeName + "' for " + player.getName() + ": " + ex.getMessage());
+            MessageUtil.sendError(player, "An error occurred while deleting your home!");
+            return null;
         });
     }
 
@@ -189,6 +233,10 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
                 String privacy = " [" + home.getPrivacyMode() + "]";
                 MessageUtil.sendMessage(player, "  - " + home.getName() + defaultTag + privacy + " @ " + home.getFormattedLocation());
             }
+        }).exceptionally(ex -> {
+            plugin.getLogger().warning("Error listing homes for " + player.getName() + ": " + ex.getMessage());
+            MessageUtil.sendError(player, "An error occurred while listing your homes!");
+            return null;
         });
     }
 
@@ -216,6 +264,10 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
             if (!home.getSharedWith().isEmpty()) {
                 MessageUtil.sendMessage(player, "  Shared with " + home.getSharedWith().size() + " players");
             }
+        }).exceptionally(ex -> {
+            plugin.getLogger().warning("Error getting home info for " + player.getName() + ": " + ex.getMessage());
+            MessageUtil.sendError(player, "An error occurred while getting home info!");
+            return null;
         });
     }
 
@@ -228,12 +280,23 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
         String oldName = args[1].toLowerCase();
         String newName = args[2].toLowerCase();
 
+        // Validate new home name
+        String validationError = validateHomeName(newName);
+        if (validationError != null) {
+            MessageUtil.sendError(player, validationError);
+            return;
+        }
+
         homeManager.renameHome(player.getUniqueId(), oldName, newName).thenAccept(success -> {
             if (success) {
                 MessageUtil.sendSuccess(player, "Home renamed from '" + oldName + "' to '" + newName + "'!");
             } else {
                 MessageUtil.sendError(player, "Failed to rename home. Check that the old name exists and the new name is not already used.");
             }
+        }).exceptionally(ex -> {
+            plugin.getLogger().warning("Error renaming home for " + player.getName() + ": " + ex.getMessage());
+            MessageUtil.sendError(player, "An error occurred while renaming your home!");
+            return null;
         });
     }
 
@@ -253,6 +316,10 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
 
             homeManager.setDefaultHome(player.getUniqueId(), homeName);
             MessageUtil.sendSuccess(player, "Set '" + homeName + "' as your default home!");
+        }).exceptionally(ex -> {
+            plugin.getLogger().warning("Error setting default home for " + player.getName() + ": " + ex.getMessage());
+            MessageUtil.sendError(player, "An error occurred while setting default home!");
+            return null;
         });
     }
 
@@ -288,11 +355,24 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
                 } else {
                     MessageUtil.sendError(player, "Failed to share home. Player may already have access or you've reached the sharing limit.");
                 }
+            }).exceptionally(ex -> {
+                plugin.getLogger().warning("Error sharing home for " + player.getName() + ": " + ex.getMessage());
+                MessageUtil.sendError(player, "An error occurred while sharing your home!");
+                return null;
             });
+        }).exceptionally(ex -> {
+            plugin.getLogger().warning("Error getting home for sharing: " + ex.getMessage());
+            MessageUtil.sendError(player, "An error occurred while sharing your home!");
+            return null;
         });
     }
 
     private void handleUnshareHome(Player player, String[] args) {
+        if (!PermissionUtil.hasPermission(player, PermissionUtil.PERMISSION_SHARE)) {
+            MessageUtil.sendNoPermission(player);
+            return;
+        }
+
         if (args.length < 3) {
             MessageUtil.sendError(player, "Usage: /home unshare <home> <player>");
             return;
@@ -315,7 +395,15 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
                 } else {
                     MessageUtil.sendError(player, "Player doesn't have access to this home!");
                 }
+            }).exceptionally(ex -> {
+                plugin.getLogger().warning("Error unsharing home for " + player.getName() + ": " + ex.getMessage());
+                MessageUtil.sendError(player, "An error occurred while unsharing your home!");
+                return null;
             });
+        }).exceptionally(ex -> {
+            plugin.getLogger().warning("Error getting home for unsharing: " + ex.getMessage());
+            MessageUtil.sendError(player, "An error occurred while unsharing your home!");
+            return null;
         });
     }
 
@@ -338,8 +426,16 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
                 return;
             }
 
-            homeManager.updateHomePrivacy(home, Home.PrivacyMode.PUBLIC);
+            homeManager.updateHomePrivacy(home, Home.PrivacyMode.PUBLIC).exceptionally(ex -> {
+                plugin.getLogger().warning("Error setting home public for " + player.getName() + ": " + ex.getMessage());
+                MessageUtil.sendError(player, "An error occurred while updating home privacy!");
+                return null;
+            });
             MessageUtil.sendSuccess(player, "Home '" + homeName + "' is now public!");
+        }).exceptionally(ex -> {
+            plugin.getLogger().warning("Error getting home for privacy update: " + ex.getMessage());
+            MessageUtil.sendError(player, "An error occurred while updating home privacy!");
+            return null;
         });
     }
 
@@ -357,8 +453,16 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
                 return;
             }
 
-            homeManager.updateHomePrivacy(home, Home.PrivacyMode.PRIVATE);
+            homeManager.updateHomePrivacy(home, Home.PrivacyMode.PRIVATE).exceptionally(ex -> {
+                plugin.getLogger().warning("Error setting home private for " + player.getName() + ": " + ex.getMessage());
+                MessageUtil.sendError(player, "An error occurred while updating home privacy!");
+                return null;
+            });
             MessageUtil.sendSuccess(player, "Home '" + homeName + "' is now private!");
+        }).exceptionally(ex -> {
+            plugin.getLogger().warning("Error getting home for privacy update: " + ex.getMessage());
+            MessageUtil.sendError(player, "An error occurred while updating home privacy!");
+            return null;
         });
     }
 
@@ -375,13 +479,9 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
             // Subcommands
             completions.addAll(Arrays.asList("set", "delete", "list", "info", "rename", "setdefault", "share", "unshare", "public", "private"));
 
-            // Add player's home names synchronously
-            try {
-                List<Home> homes = homeManager.getHomes(player.getUniqueId()).join();
-                completions.addAll(homes.stream().map(Home::getName).collect(Collectors.toList()));
-            } catch (Exception e) {
-                // Ignore errors in tab completion
-            }
+            // Add player's home names from cache (non-blocking)
+            List<Home> homes = homeManager.getHomesCached(player.getUniqueId());
+            completions.addAll(homes.stream().map(Home::getName).collect(Collectors.toList()));
 
             return completions.stream()
                     .filter(s -> s.toLowerCase().startsWith(args[0].toLowerCase()))
@@ -394,12 +494,9 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
                     subcommand.equals("setdefault") || subcommand.equals("share") || subcommand.equals("unshare") ||
                     subcommand.equals("public") || subcommand.equals("private")) {
 
-                try {
-                    List<Home> homes = homeManager.getHomes(player.getUniqueId()).join();
-                    completions.addAll(homes.stream().map(Home::getName).collect(Collectors.toList()));
-                } catch (Exception e) {
-                    // Ignore errors in tab completion
-                }
+                // Get homes from cache (non-blocking)
+                List<Home> homes = homeManager.getHomesCached(player.getUniqueId());
+                completions.addAll(homes.stream().map(Home::getName).collect(Collectors.toList()));
             }
         }
 
